@@ -12,7 +12,17 @@ export default ({
   const [loading, setLoading] = useState(true);
   const [detail, setDetail] = useState({
     loading: true,
-    result: { title, backgroundImage, poster, overview, votes },
+    result: {
+      title,
+      backgroundImage,
+      poster,
+      overview,
+      votes,
+      // 로딩 중일 때 results가 undefined 되지 않도록 default 값 설정
+      videos: {
+        results: [],
+      },
+    },
   });
   const getData = async () => {
     const [getDetail, getDetailError] = isTv

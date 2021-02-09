@@ -2,7 +2,7 @@ import { AppLoading } from "expo";
 import { Asset } from "expo-asset"; // asset은 external module이다. expo-asset은 기본적으로 asset에 접근하게 해준다.
 import React, { useState } from "react";
 import { Image, StatusBar } from "react-native";
-import { Ionicons } from "@expo/vector-icons";
+import { Ionicons, FontAwesome } from "@expo/vector-icons";
 import * as Font from "expo-font";
 import { NavigationContainer } from "@react-navigation/native";
 import Stack from "./navigation/Stack";
@@ -28,7 +28,7 @@ export default function App() {
       "https://images.unsplash.com/photo-1571847140471-1d7766e825ea?ixid=MXwxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHw%3D&ixlib=rb-1.2.1&auto=format&fit=crop&w=673&q=80",
       require("./assets/splash.png"),
     ]);
-    const fonts = cacheFonts([Ionicons.font]);
+    const fonts = cacheFonts([Ionicons.font, FontAwesome.font]);
     // console.log(Promise.all([...images, ...fonts]));
     return Promise.all([...images, ...fonts]);
   };
