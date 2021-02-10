@@ -46,17 +46,26 @@ export default ({ results }) => {
       }).start();
     },
   });
+  // interpolate: input 값을 다른 output값으로 설정 가능
+  const rotationValues = position.x.interpolate({
+    inputRange: [-100, 0, 100],
+    outputRange: ["-5deg", "0deg", "5deg"],
+    extrapolate: "clamp", // extrapolate: "clamp" => interpolate에 제한을 건다.
+  });
 
   return (
     <Container>
-      {results.reverse().map((result, index) => {
+      {results.map((result, index) => {
         if (index === topIndex) {
           return (
             <Animated.View
               style={{
                 ...styles,
                 zIndex: 1,
-                transform: [...position.getTranslateTransform()], //getTranslateTransform() => x와 y에 대해서 css 표현을 얻어내는 함수
+                transform: [
+                  { rotate: rotationValues },
+                  ...position.getTranslateTransform(),
+                ], //getTranslateTransform() => x와 y에 대해서 css 표현을 얻어내는 함수
               }}
               key={result.id}
               {...panResponder.panHandlers}
@@ -69,6 +78,7 @@ export default ({ results }) => {
           <Animated.View
             style={{
               ...styles,
+              zIndex: -index,
             }}
             key={result.id}
             {...panResponder.panHandlers}
