@@ -26,6 +26,7 @@ const Poster = styled.Image`
 
 export default ({ results }) => {
   const [topIndex, setTopIndex] = useState(0);
+  const nextCard = () => setTopIndex((currentValue) => currentValue + 1);
   const position = new Animated.ValueXY();
   const panResponder = PanResponder.create({
     onStartShouldSetPanResponder: () => true,
@@ -33,17 +34,37 @@ export default ({ results }) => {
     onPanResponderMove: (evt, { dx, dy }) => {
       position.setValue({ x: dx, y: dy });
     },
-    onPanResponderRelease: () => {
-      // Animated.spring()은 어떤 값을 가지면, 그걸 애니메이션으로 만든다.
-      // 즉, 값을 애니메이션처럼 천천히 0으로 바뀌게 만든다.
-      Animated.spring(position, {
-        toValue: {
-          x: 0,
-          y: 0,
-        },
-        // 드래그 후 놨을 때 원래 포지션으로 돌아가면서 얼마나 바운스 효과를 줄건지
-        // bounciness: 10,
-      }).start();
+    onPanResponderRelease: (evt, { dx, dy }) => {
+      if (dx >= 250) {
+        // dx값이 300 이상일 때 화면에서 손을 떼면 카드를 오른쪽으로 버린다.
+        Animated.spring(position, {
+          toValue: {
+            x: WIDTH + 100,
+            y: dy,
+          },
+        }).start(nextCard); // start()는 callback을 갖게 해준다. 따라서 nextCard라는 index 증가 함수를 만들어서 callback으로 지정하게 한다.
+      } else if (dx <= -250) {
+        // dx값이 -300 이하일 때 화면에서 손을 떼면 카드를 왼쪽으로 버린다.
+        Animated.spring(position, {
+          toValue: {
+            x: -WIDTH - 100,
+            y: dy,
+          },
+        }).start(nextCard);
+      }
+      // 그 이외의 상황에서는 다시 카드를 원상태로 복귀하게 한다.
+      else {
+        // Animated.spring()은 어떤 값을 가지면, 그걸 애니메이션으로 만든다.
+        // 즉, 값을 애니메이션처럼 천천히 0으로 바뀌게 만든다.
+        Animated.spring(position, {
+          toValue: {
+            x: 0,
+            y: 0,
+          },
+          // 드래그 후 놨을 때 원래 포지션으로 돌아가면서 얼마나 바운스 효과를 줄건지
+          // bounciness: 10,
+        }).start();
+      }
     },
   });
   // interpolate: input 값을 다른 output값으로 설정 가능
@@ -65,6 +86,10 @@ export default ({ results }) => {
   return (
     <Container>
       {results.map((result, index) => {
+        // 버려진 카드는 더이상 Rendering 되지 않게 작업(최적화)
+        if (index < topIndex) {
+          return null;
+        }
         if (index === topIndex) {
           return (
             <Animated.View
